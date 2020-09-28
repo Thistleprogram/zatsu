@@ -1,0 +1,531 @@
+
+#pragma GCC target ("avx")
+#pragma GCC optimize("Ofast")
+#pragma GCC optimize("unroll-loops")
+//#pragma GCC target("sse,sse2,sse3,ssse3,sse4,popcnt,abm,mmx,avx,tune=native")
+#define _USE_MATH_DEFINES
+#include<iostream>
+#include<string>
+#include<queue>
+#include<cmath>
+#include<map>
+#include<set>
+#include<list>
+#include<iomanip>
+#include<vector>
+#include<random>
+#include<functional>
+#include<algorithm>
+#include<stack>
+#include<cstdio>
+#include<cstring>
+#include<bitset>
+#include<unordered_map>
+#include<climits>
+#include<fstream>
+#include<complex>
+#include<time.h>
+#include<cassert>
+#include<functional>
+#include<numeric>
+#include<tuple>
+using namespace std;
+using ll = long long;
+using ld = long double;
+using H = pair<ll, ll>;
+using P = pair<ll, H>;
+using vi = vector<ll>;
+#define all(a) (a).begin(),(a).end()
+#define fs first
+#define sc second
+#define xx first
+#define yy second.first
+#define zz second.second
+#define Q(i,j,k) mkp(i,mkp(j,k))
+#define rng(i,s,n) for(ll i = (s) ; i < (n) ; i++)
+#define rep(i,n) rng(i, 0, (n))
+#define mkp make_pair
+#define vec vector
+#define pb emplace_back
+#define siz(a) (int)(a).size()
+#define crdcomp(b) sort(all((b)));(b).erase(unique(all((b))),(b).end())
+#define getidx(b,i) (lower_bound(all(b),(i))-(b).begin())
+#define ssp(i,n) (i==(ll)(n)-1?"\n":" ")
+#define ctoi(c) (int)(c-'0')
+#define itoc(c) (char)(c+'0')
+#define cyes printf("Yes\n")
+#define cno printf("No\n")
+#define cdf(n) for(int quetimes_=(n);quetimes_>0;quetimes_--)
+#define gcj printf("Case #%lld: ",qq123_+1)
+#define readv(a,n) a.resize(n,0);rep(i,(n)) a[i]=read()
+#define found(a,x) (a.find(x)!=a.end())
+constexpr ll mod = (ll)1e9 + 7;
+constexpr ll Mod = 998244353;
+constexpr ld EPS = 1e-10;
+constexpr ll inf = (ll)3 * 1e18;
+constexpr int Inf = (ll)15 * 1e8;
+constexpr int dx[] = { -1,1,0,0 }, dy[] = { 0,0,-1,1 };
+template<class T>bool chmax(T& a, const T& b) { if (a < b) { a = b; return 1; } return 0; }
+template<class T>bool chmin(T& a, const T& b) { if (b < a) { a = b; return 1; } return 0; }
+ll read() { ll u, k = scanf("%lld", &u); return u; }
+string reads() { string s; cin >> s; return s; }
+H readh(short g = 0) { H u; int k = scanf("%lld %lld", &u.fs, &u.sc); if (g == 1) u.fs--, u.sc--; if (g == 2) u.fs--; return u; }
+bool ina(H t, int h, int w) { return 0 <= t.fs && t.fs < h && 0 <= t.sc && t.sc < w; }
+bool ina(int t, int l, int r) { return l <= t && t < r; }
+ll gcd(ll i, ll j) { return j ? gcd(j, i % j) : i; }
+ll popcount(ll x) {
+    int sum = 0; for (int i = 0; i < 60; i++)if ((1ll << i) & x) sum++;
+    return sum;
+}
+template<typename T>
+class csum {
+    vec<T> v;
+public:
+    csum(vec<T>& a) :v(a) { build(); }
+    csum() {}
+    void init(vec<T>& a) { v = a; build(); }
+    void build() {
+        for (int i = 1; i < v.size(); i++) v[i] += v[i - 1];
+    }
+    //[l,r]
+    T a(int l, int r) {
+        if (r < l) return 0;
+        return v[r] - (l == 0 ? 0 : v[l - 1]);
+    }
+    //[l,r)
+    T b(int l, int r) {
+        return a(l, r - 1);
+    }
+    T a(pair<int, int>t) {
+        return a(t.first, t.second);
+    }
+    T b(pair<int, int>t) {
+        return b(t.first, t.second);
+    }
+};
+class mint {
+public:ll v;
+      mint(ll v = 0) { s(v % mod + mod); }
+      constexpr static int mod = Mod;// (ll)1e9 + 7;
+      constexpr static int fn_ = (ll)2e6 + 5;
+      static mint fact[fn_], comp[fn_];
+      mint pow(int x) const {
+          mint b(v), c(1);
+          while (x) {
+              if (x & 1) c *= b;
+              b *= b;
+              x >>= 1;
+          }
+          return c;
+      }
+      inline mint& s(int vv) {
+          v = vv < mod ? vv : vv - mod;
+          return *this;
+      }
+      inline mint inv()const { return pow(mod - 2); }
+      inline mint operator-()const { return mint() - *this; }
+      inline mint& operator+=(const mint b) { return s(v + b.v); }
+      inline mint& operator-=(const mint b) { return s(v + mod - b.v); }
+      inline mint& operator*=(const mint b) { v = v * b.v % mod; return *this; }
+      inline mint& operator/=(const mint b) { v = v * b.inv().v % mod; return *this; }
+      inline mint operator+(const mint b) const { return mint(v) += b; }
+      inline mint operator-(const mint b) const { return mint(v) -= b; }
+      inline mint operator*(const mint b) const { return mint(v) *= b; }
+      inline mint operator/(const mint b) const { return mint(v) /= b; }
+      friend ostream& operator<<(ostream& os, const mint& m) {
+          return os << m.v;
+      }
+      friend istream& operator>>(istream& is, mint& m) {
+          int x; is >> x; m = mint(x);
+          return is;
+      }
+      bool operator<(const mint& r)const { return v < r.v; }
+      bool operator>(const mint& r)const { return v > r.v; }
+      bool operator<=(const mint& r)const { return v <= r.v; }
+      bool operator>=(const mint& r)const { return v >= r.v; }
+      bool operator==(const mint& r)const { return v == r.v; }
+      bool operator!=(const mint& r)const { return v != r.v; }
+      explicit operator bool()const { return v; }
+      explicit operator int()const { return v; }
+      mint comb(mint k) {
+          if (k > * this) return mint();
+          if (!fact[0]) combinit();
+          if (v >= fn_) {
+              if (k > * this - k) k = *this - k;
+              mint tmp(1);
+              for (int i = v; i >= v - k.v + 1; i--) tmp *= mint(i);
+              return tmp * comp[k.v];
+          }
+          return fact[v] * comp[k.v] * comp[v - k.v];
+      }//nCk
+      mint perm(mint k) {
+          if (k > * this) return mint();
+          if (!fact[0]) combinit();
+          if (v >= fn_) {
+              mint tmp(1);
+              for (int i = v; i >= v - k.v + 1; i--) tmp *= mint(i);
+              return tmp;
+          }
+          return fact[v] * comp[v - k.v];
+      }//nPk
+      static void combinit() {
+          fact[0] = 1;
+          for (int i = 1; i < fn_; i++) fact[i] = fact[i - 1] * mint(i);
+          comp[fn_ - 1] = fact[fn_ - 1].inv();
+          for (int i = fn_ - 2; i >= 0; i--) comp[i] = comp[i + 1] * mint(i + 1);
+      }
+}; mint mint::fact[fn_], mint::comp[fn_];
+
+//--------------------------------------------------------------
+
+//--------------------------------------------------------------
+int lengt;
+
+class Node {
+public:
+    int start, dept;
+    Node* link;
+
+    vector<Node*>childs;
+    static Node* nil;
+
+    Node() {}
+    Node(int start, int depth) :start(start), dept(depth) {}
+
+    Node* search_child(string& buff, int size, char x) {
+        for (auto& child : childs) {
+            if (child->start < size && buff[child->start] == x) {
+                return child;
+            }
+        }
+        return nil;
+    }
+    void insert_child(Node* child) {
+        childs.push_back(child);
+    }
+
+    void delete_child(Node* child) {
+        int t = 0;
+        for (int i = 0; i < childs.size(); i++) {
+            if (childs[i] != child) childs[t++] = childs[i];
+        }
+        childs.erase(childs.begin() + t, childs.end());
+    }
+
+    int len() {
+        if (start == -1)  return 0;
+        if (childs.empty()) return 1e8;
+        return (*(childs.begin()))->dept - dept;
+    }
+
+    vector<Node*> traverse_leaf() {
+        if (childs.size() == 0) return vector<Node*>{this};
+        vector<Node*>v, r;
+        for (auto child : childs) {
+            r = child->traverse_leaf();
+            for (auto g : r) v.push_back(g);
+        }
+        return v;
+    }
+
+    vi size() {
+        if (childs.size() == 0) return vi{ lengt - dept };
+        vi tmp{ len() };
+        for (auto child : childs) {
+            vi g = child->size();
+            for (auto r : g) tmp.pb(r);
+        }
+        return tmp;
+    }
+
+    long long substr_num(int size) {
+        long long sum = 0;
+        if (childs.empty()) sum += size - start - 1;
+        else sum += len();
+        for (auto child : childs) {
+            sum += child->substr_num(size);
+        }
+        return sum;
+    }
+}; Node* Node::nil;
+
+
+Node pool[500000];//Nodeのプール
+int sit;//今までに使った数
+
+Node* news(int start, int depth) {
+    pool[sit] = Node(start, depth);
+    return &pool[sit++];
+}
+
+
+
+class SuffixTree {
+
+
+    int size;//文字サイズ
+    string buf;
+    Node* root = Node::nil;//木の根
+
+
+
+
+    int bi;//文字列中の位置
+    int ni;//node内の位置
+    int si;//照合を始める場所
+
+    Node* node;//現在見ている節
+    Node* prev;//nodeの親
+    Node* child;
+
+    int nlen;//nodeの長さ
+
+
+public:
+    SuffixTree() {
+        root = news(-1, 0);
+        root->link = root;
+        node = root;
+        prev = node;
+        nlen = 0;
+        bi = 0; ni = 0; si = 0;
+    }
+    void init(string str, bool dynamic) {
+        if (!dynamic) str += '$';
+        add_string(str);
+    }
+
+    void add_string(string str) {
+
+        buf += str;
+        size = buf.size();
+
+        nlen = node->len();
+
+
+        while (bi < size) {
+
+            if (ni == nlen) {//部分文字列がnodeの値に全て一致した
+                //次の子を探す
+
+                child = node->search_child(buf, size, buf[bi]);
+
+                if (child == Node::nil) {
+                    if (si == bi) {
+                        //ルートに突っ込む
+                        root->insert_child(news(bi, 0));//biから始まる文字を適当に突っ込んで終わり。サフィックスリンクとか考える必要なし
+                        si++; bi++;
+                    }//照合位置と伸ばした最後の位置が同じだった場合は、1文字も一致しなかったということだから根に付け加える
+
+
+                    else {
+                        insert_leaf();
+                    }//少し辿ってから一致しなかったわけだから、葉を追加して、サフィックスリンクをたどっていき終わる。今の時点で区切れているわけだから、1文字削られても必ず区切られている
+                }//必ずサフィックスリンクが存在しているという証明は、節を作ると絶対にそれを作るからかな
+                //divide_nodeとかをするときに絶対にこれが含まれていると確認すること
+                else {
+
+                    prev = node;
+                    node = child;
+                    nlen = child->len();
+                    ni = 1; //node内の位置は1文字目ということかな
+                    bi += 1;//現在見ているラストの場所はここですって感じかな
+                }
+            }
+            else {
+                if (buf[bi] != buf[node->start + ni]) {
+                    divide_node();
+                }
+                else {
+                    ni++; bi++;
+                }
+            }
+        }
+    }
+
+private:
+    void insert_leaf() {
+        node->insert_child(news(bi, node->dept + node->len()));//初期処理
+        node = node->link;//リンク先に移動する。bi-1までの存在は保証されているため。
+
+        si++;//今回の照合が終わったから次の照合に進む
+        while (si < bi) {
+            if (bi < size) {
+                Node* child = node->search_child(buf, size, buf[bi]);//子供が見つかりますか？
+
+                if (child != Node::nil) {
+                    prev = node; node = child; nlen = child->len(); ni = 1; bi++;
+                    return;
+                }
+            }//万が一見つかった場合は底をたどり元の探索に戻す
+
+            node->insert_child(news(bi, node->dept + node->len()));
+            node = node->link;
+            si++;
+        }
+        prev = root; node = root; nlen = 0; ni = 0;
+    }
+
+
+
+    void divide_node() {
+        Node* link_node = insert_node(ni);//nodeをdivideした時の上側の頂点にはlink先が設定されていない。下にはされている。
+        //こいつには何があろうと設定しなければならない（強い意志）
+        si++;
+
+        while (si < bi) {
+            int match = search_next_node(prev->link, si, bi);
+
+            if (match == 0) {
+                if (bi < size) {
+                    Node* child = node->search_child(buf, size, buf[bi]);
+                    //これは必ず見つかる。見つからないなら個々でも見つかっていない
+                    if (child != Node::nil) {
+                        link_node->link = node;//さっきのところの行く先はここになります？
+                        //matchが0の時は[si,bi)が完全一致した場合→つまりは自分と一致する場合。より短い場合はどうする？　存在しないっぽい
+
+                        prev = node; node = child; nlen = child->len();
+                        ni = 1; bi++;
+                        return;
+                    }
+                }
+                //子供が見つからない場合
+                link_node->link = node;//とりあえず自分のところにつなげてよい
+                insert_leaf();//葉を入れて、これで返す。
+                return;
+            }
+            link_node->link = insert_node(match);//上の方をくっつける
+            link_node = link_node->link;
+            si++;
+        }
+
+        link_node->link = root;
+        prev = root; node = root; ni = 0; nlen = 0;
+        return;
+    }
+
+    //nodeで、iが検索開始位置、endが検索終了位置で、どの頂点の何番目がそうですか？というのを判定する
+    int search_next_node(Node* nod, int i, int end) {
+        prev = nod;
+        if (nod != root) {
+            i += nod->dept + nod->len();//これはきっとたぶんniを渡されているからだろうな　本当ではなさそう
+        }
+
+        while (i < end) {
+            Node* child = nod->search_child(buf, size, buf[i]);
+            int j = child->len();
+            if (i + j > end) {
+                prev = nod; node = child;
+                return end - i;
+            }
+            i += j;
+            prev = nod;
+            nod = child;
+        }
+        prev; node = nod;
+        return 0;
+    }
+
+
+
+    Node* insert_node(int sub_match) {
+        Node* new_node = news(node->start, node->dept);
+
+        node->dept += sub_match;
+        node->start += sub_match;
+
+        prev->delete_child(node);
+        prev->insert_child(new_node);
+        new_node->insert_child(node);
+
+        Node* leaf = news(bi, node->dept);
+        new_node->insert_child(leaf);
+        return new_node;
+    }
+
+    Node* search_pattern_sub(string seq) {
+        int sz = seq.size();
+        Node* node = root;
+        int i = 0;
+        while (i < sz) {
+            Node* child = node->search_child(buf, size, seq[i]);
+            if (child == Node::nil) {
+                return Node::nil;
+            }
+            int j = 1, k = child->len();
+
+            while (j < k) {
+                if (i + j == sz) return child;
+                if (i + j == size || seq[i + j] != buf[child->start + j]) {
+                    return Node::nil;
+                }
+                j++;
+            }
+            i += j;
+            node = child;
+        }
+        return node;
+    }
+
+
+public:
+
+    bool search_pattern(string s) {
+        Node* node = search_pattern_sub(s);
+        return node != Node::nil;
+    }
+
+    long long substr_size(string s) {
+        Node* node = search_pattern_sub(s);
+        return node->substr_num(size);
+    }
+    vector<int>search_pattern_all(string s) {
+        Node* node = search_pattern_sub(s);
+        if (node == Node::nil) return vector<int>();
+        vector<int>v;
+        vector<Node*>u = node->traverse_leaf();
+        for (auto g : u) {
+            v.push_back(g->start - g->dept);
+        }
+        return v;
+    }
+    vi getall() {
+        return root->size();
+    }
+};
+
+SuffixTree st;
+mt19937 rnd;
+
+signed main() {
+    string s = "";
+    st.init("", 0);
+    rep(i, 8000) {
+        int t = rnd() % 28;
+        if (t == 26) s += " ";
+        else if (t == 27) s += "\n";
+        else s += (char)('a' + t);
+    }
+    //while (getline(cin, s)) {
+    if (s == "|||");
+        else {
+            st.add_string(s);
+            lengt += siz(s);
+        }
+    //}
+    cout << lengt << endl;
+    vi tmp = st.getall();
+    sort(all(tmp));
+    cout << tmp.size() << endl;
+    ld med = 0;
+    for (auto g : tmp) med += g;
+    med /= siz(tmp);
+    cout << med << endl;
+    ld sigm = 0;
+    for (auto g : tmp) sigm += (g - med) * (g - med);
+    sigm /= siz(tmp);
+    sigm = sqrt(sigm);
+    cout << sigm << endl;
+    printf("%.4LF\n", (tmp[0] - med)/sigm * 10 + 50);
+    printf("%.4LF\n", (tmp.back() - med)/sigm * 10 + 50);
+}
