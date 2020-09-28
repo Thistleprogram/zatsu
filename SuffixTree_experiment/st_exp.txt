@@ -494,38 +494,50 @@ public:
     }
 };
 
-SuffixTree st;
 mt19937 rnd;
 
 signed main() {
-    string s = "";
-    st.init("", 0);
-    rep(i, 8000) {
-        int t = rnd() % 28;
-        if (t == 26) s += " ";
-        else if (t == 27) s += "\n";
-        else s += (char)('a' + t);
-    }
-    //while (getline(cin, s)) {
-    if (s == "|||");
-        else {
-            st.add_string(s);
-            lengt += siz(s);
+    ld want = 35.4;
+    ld WANT = 56.8;
+    int a = 1, b = 1;
+    ld ans = 1000, ans2 = 1000;
+
+    rng(z,1, 100)rng(j,1, 100) {
+        lengt = 0;
+        string s = "";
+        sit = 0;
+        SuffixTree st;
+        st.init("", 0);
+        rep(i, 8000) {
+            int t = rnd() % (26 + z + j);
+            if (26 <= t && t < 26 + z) s += " ";
+            else if (26 + z <= t && t < 26 + z + j) s += "\n";
+            else s += (char)('a' + t);
         }
+        /*while (getline(cin, s)) {
+            if (s == "|||")break;*/
+            //else {
+        st.add_string(s);
+        lengt += siz(s);
+        //}
     //}
-    cout << lengt << endl;
-    vi tmp = st.getall();
-    sort(all(tmp));
-    cout << tmp.size() << endl;
-    ld med = 0;
-    for (auto g : tmp) med += g;
-    med /= siz(tmp);
-    cout << med << endl;
-    ld sigm = 0;
-    for (auto g : tmp) sigm += (g - med) * (g - med);
-    sigm /= siz(tmp);
-    sigm = sqrt(sigm);
-    cout << sigm << endl;
-    printf("%.4LF\n", (tmp[0] - med)/sigm * 10 + 50);
-    printf("%.4LF\n", (tmp.back() - med)/sigm * 10 + 50);
+    //cout << lengt << endl;
+        vi tmp = st.getall();
+        sort(all(tmp));
+        ld med = 0;
+        for (auto g : tmp) med += g;
+        med /= siz(tmp);
+        ld sigm = 0;
+        for (auto g : tmp) sigm += (g - med) * (g - med);
+        sigm /= siz(tmp);
+        sigm = sqrt(sigm);
+        ld mn = (tmp[0] - med) / sigm * 10 + 50;
+        ld mx = (tmp.back() - med) / sigm * 10 + 50;
+        if ((mx - WANT) * (mx - WANT) < (ans - WANT) * (ans - WANT)) {
+            ans = mx, ans2 = mn;
+            a = z, b = j;
+        }
+    }
+    cout << a << " " << b << endl;
+    cout << ans2 << " " << ans << endl;
 }
